@@ -1,0 +1,11 @@
+connector:
+  mongodb:
+    dbname: convertml_dev
+  sns:
+    terminate_ec2_instance:
+      topic_arn: arn:aws:sns:us-east-1:383236716621:terminate-ec2-instance
+
+dataflow_tasks:
+  churn_task:
+    config:
+      name: churn_ml_dev_model

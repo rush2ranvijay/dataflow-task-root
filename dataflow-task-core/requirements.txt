@@ -1,0 +1,16 @@
+python-dotenv
+flatten-json
+xlrd
+openpyxl
+SQLAlchemy
+#numpy
+pandas
+tabulate
+PyYAML
+scikit-learn
+pymongo
+boto3
+botocore
+Flask
+certifi
+psycopg2

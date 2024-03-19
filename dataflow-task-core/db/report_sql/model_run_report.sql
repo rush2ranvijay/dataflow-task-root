@@ -1,0 +1,1 @@
+SELECT * FROM model_run where model_name = "churn_ml"

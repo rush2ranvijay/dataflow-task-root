@@ -1,0 +1,28 @@
+sys:
+  aws:
+    region_name: ${osenv.AWS_DEFAULT_REGION}
+    s3_bucket_name: ml-ops-data
+  vault:
+    enabled: True
+    impl: task_ops.base.secrets.NoopSecretVault
+    impl_kwargs:
+      region_name: ${sys.aws.region_name}
+
+connector:
+  mongodb:
+    dbname: convertml
+    mongo_secret_id: mongo_secret_id
+  postgresdb:
+    url: jdbc:postgresql://postgres:5434/dataflow
+    username: root
+    password: rootpw
+  sns:
+    terminate_ec2_instance:
+      topic_arn: arn:aws:sns:us-east-1:383236716621:terminate-ec2-instance
+
+dataflow_tasks:
+  simple_task:
+    config:
+      name: simple_task
+      run_frequency: DAILY
+      input_file_type: CSV
