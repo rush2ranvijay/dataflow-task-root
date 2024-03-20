@@ -13,4 +13,4 @@ boto3
 botocore
 Flask
 certifi
-psycopg2
+psycopg2-binary

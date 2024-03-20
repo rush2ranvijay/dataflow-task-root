@@ -11,7 +11,7 @@ class SimpleDataflowTask(DataFlowBaseTask):
         self.dataflow_task_config = get_dataflow_task_section(self.dataflow_task_name, config)
 
     def execute_dataflow_task(self, **kwargs):
-        pass
+        print(f"Simple Task [ {self.dataflow_task_name} ] has been Started with config [ {self.dataflow_task_section} ] ")
 
 
 def main():
