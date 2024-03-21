@@ -11,6 +11,10 @@ def is_running_in_glue():
     return os.environ.get("GLUE_INSTALLATION") is not None
 
 
+def is_running_in_local():
+    return os.environ.get("APP_ENV_NAME") not in ["dev", "prod"]
+
+
 class S3Url(object):
 
     def __init__(self, url):

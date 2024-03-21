@@ -9,7 +9,7 @@ from typing import Any, Callable, List
 
 import yaml
 
-from task_ops import is_running_in_glue
+from task_ops import is_running_in_local
 from task_ops.base import logutils, generalutils
 from task_ops.base.fsutils import fs_exists, fs_open
 from task_ops.base.generalutils import flatten_dict
@@ -231,10 +231,10 @@ class Environment:
 def _bootstrap():
     from dotenv import load_dotenv
     load_dotenv()
-    if is_running_in_glue():
-        path_prefix = ""
-    else:
+    if is_running_in_local():
         path_prefix = "../../"
+    else:
+        path_prefix = "/root/"
     with fs_open(f"{path_prefix}conf/defaults.yaml") as fp:
         env.add_source(YamlPropertySource.load_from(fp, "defaults"))
 
