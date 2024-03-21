@@ -21,5 +21,5 @@ RUN pip install -r /root/requirements.txt
 # Copy the actual code
 COPY . /root
 
-ENTRYPOINT ["python","/simple_task_launcher.py"]
+ENTRYPOINT ["python","/root/assets/task_launcher/simple_task_launcher.py"]
 CMD []
