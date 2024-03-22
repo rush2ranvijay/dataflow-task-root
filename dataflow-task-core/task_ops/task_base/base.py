@@ -5,6 +5,7 @@ from typing import Any
 
 from task_ops.base import logutils
 from task_ops.base.environments import Environment
+from task_ops.task_base.task_args import get_task_id, get_db_url
 from task_ops.task_base.task_status import TaskStatus
 
 log = logutils.get_logger(__name__)
@@ -96,8 +97,8 @@ class DataFlowBaseTask(BaseTask):
 
     def init_task_status(self, **kwargs):
         # Initialize TaskStatus with task_id and jdbc_url
-        self.task_id = kwargs.get("task_id")
-        self.jdbc_url = kwargs.get("jdbc_url")
+        self.task_id = get_task_id()
+        self.jdbc_url = get_db_url()
         if self.task_id and self.jdbc_url:
             self.task_status = TaskStatus(task_id=self.task_id, jdbc_url=self.jdbc_url)
 
@@ -108,7 +109,7 @@ class DataFlowBaseTask(BaseTask):
         try:
             if self.task_status:
                 self.task_status.running()  # Mark task as running
-            self.execute_dataflow_task(**kwargs)   # Running Actual task workload
+            self.execute_dataflow_task(**kwargs)  # Running Actual task workload
             if self.task_status:
                 self.task_status.completed()  # Mark task as completed
             self.on_success(**kwargs)

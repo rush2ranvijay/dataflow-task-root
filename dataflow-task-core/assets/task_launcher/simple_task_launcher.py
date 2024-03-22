@@ -1,18 +1,18 @@
 import sys
 
 from task_ops.base import logutils
+from task_ops.task_base.task_args import get_db_url, get_task_id
 from task_ops.tasks_dataflow.simple_dataflow_task import SimpleDataflowTask
 
 log = logutils.get_logger(__name__)
 
 
 def main():
-    # args = ['/tmp/glue-python-scripts-Q1FI/simple_task_launcher.py', '--extra-py-files',
-    # 's3://aws-glue-assets-383236716621-us-east-2/app/convertML-0.1.0-py3-none-any.whl', '--job_name',
-    # 'churn_ml_model_ranvijay', '--scriptLocation',
-    # 's3://aws-glue-assets-383236716621-us-east-2/app/scripts/simple_task_launcher.py', '--python-version', '3.9',
-    # '--tenant_id', 'ranvijay']
-    return SimpleDataflowTask("simple_task", "config", **{"sys_argv": sys.argv[1:]}).run()
+    print('******************************************************************')
+    print('spring.cloud.task.executionid cmd arg : {}'.format(get_task_id()))
+    print('get_db_url : {}'.format(get_db_url()))
+    print('******************************************************************')
+    return SimpleDataflowTask("simple_task", "config", **{"sys_argv": sys.argv}).run()
 
 
 if __name__ == "__main__":

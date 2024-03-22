@@ -1,3 +1,5 @@
+import json
+import os
 import sys
 from collections import defaultdict
 
@@ -22,7 +24,7 @@ def get_cmd_arg(name):
         return None
 
 
-def get_db_url():
+def get_sqlserver_db_url():
     """Computes sqlalchemy connection URL
 
     Uses the s.d.username, s.d.password and s.d.url properties to compute the sqlalchemy url.
@@ -31,13 +33,29 @@ def get_db_url():
     Returns:
       sqlalchemy compatible URL compatible with the target DB.
     """
-    username = get_cmd_arg('spring.datasource.username')
-    password = get_cmd_arg('spring.datasource.password')
-    jdbc_url = get_cmd_arg('spring.datasource.url')
+    username = get_spring_env_arg('spring.datasource.username')
+    password = get_spring_env_arg('spring.datasource.password')
+    jdbc_url = get_spring_env_arg('spring.datasource.url')
 
     return str(jdbc_url) \
         .replace('jdbc:', '') \
         .replace('sqlserver:', 'mssql+pyodbc:') \
+        .replace('//', '//{username}:{password}@'.format(username=username, password=password))
+
+
+def get_db_url():
+    """Computes sqlalchemy connection URL
+
+    Uses the s.d.username, s.d.password and s.d.url properties to compute the sqlalchemy url.
+    This provides access to the SCDF internal DB and tables such as TASK_EXECUTION.
+
+    """
+    username = get_spring_env_arg('spring.datasource.username')
+    password = get_spring_env_arg('spring.datasource.password')
+    jdbc_url = get_spring_env_arg('spring.datasource.url')
+    return str(jdbc_url) \
+        .replace('jdbc:', '') \
+        .replace('postgresql:', 'postgresql+psycopg2:') \
         .replace('//', '//{username}:{password}@'.format(username=username, password=password))
 
 
@@ -54,3 +72,20 @@ def get_task_id():
 
 def get_task_name():
     return get_cmd_arg('spring.cloud.task.name')
+
+
+def get_env_var(name):
+    if name in os.environ:
+        return os.environ[name]
+    else:
+        print('Unknown environment variable requested: {}'.format(name))
+        return None
+
+
+def get_spring_env_arg(name):
+    spring_env_vars = json.loads(get_env_var('SPRING_APPLICATION_JSON'))
+    if name in spring_env_vars:
+        return spring_env_vars[name]
+    else:
+        print('Unknown environment variable requested: {}'.format(name))
+        return None
