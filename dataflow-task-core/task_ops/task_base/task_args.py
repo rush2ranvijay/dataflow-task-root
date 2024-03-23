@@ -56,6 +56,7 @@ def get_db_url():
     return str(jdbc_url) \
         .replace('jdbc:', '') \
         .replace('postgresql:', 'postgresql+psycopg2:') \
+        .replace('localhost', 'host.docker.internal') \
         .replace('//', '//{username}:{password}@'.format(username=username, password=password))
 
 

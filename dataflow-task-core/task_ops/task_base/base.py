@@ -48,6 +48,7 @@ class BaseTask(abc.ABC):
         """
             BaseTask class template method needs to override by its child class .
         """
+        self.task_running(**kwargs)  # Task Running
         step = None
         try:
             log.debug(f"Running Task [ {self.dataflow_task_name} ] with args: {kwargs}")
@@ -55,14 +56,17 @@ class BaseTask(abc.ABC):
             self.pre_run(**kwargs)
             step = "RUN"
             run_status = self.do_run(**kwargs)
+            self.task_completed(**kwargs)  # Task Completed
             log.debug(f"Executed Task [ {self.dataflow_task_name} ] and post_run life-cycle method is started")
             step = "POST_RUN"
             self.post_run(**kwargs)
         except TimeoutError as e:  # flake8: noqa
             log.exception(f"Timeout error occurred: {e}")
+            self.task_failed(e, **kwargs)  # Task Failed
             raise
         except Exception as e:  # flake8: noqa
             log.exception(f"Unhandled exception occurred in step '{step}' for Task '{self.dataflow_task_name}': {e}")
+            self.task_failed(e, **kwargs)  # Task Failed
             raise
         finally:
             self.write_validations()
@@ -73,6 +77,15 @@ class BaseTask(abc.ABC):
         pass
 
     def pre_run(self, **kwargs):
+        pass
+
+    def task_running(self, **kwargs):
+        pass
+
+    def task_completed(self, **kwargs):
+        pass
+
+    def task_failed(self, e: Exception, **kwargs):
         pass
 
     def post_run(self, **kwargs):
@@ -102,31 +115,37 @@ class DataFlowBaseTask(BaseTask):
         if self.task_id and self.jdbc_url:
             self.task_status = TaskStatus(task_id=self.task_id, jdbc_url=self.jdbc_url)
 
+    def task_running(self, **kwargs):
+        if self.task_status:
+            self.task_status.running()  # Mark task as running
+
+    def task_completed(self, **kwargs):
+        if self.task_status:
+            self.task_status.completed()  # Mark task as completed
+
+    def task_failed(self, e, **kwargs):
+        if self.task_status:
+            self.task_status.failed(exit_code=1, exit_message="Task Failed", error_message=str(e))
+
     def do_run(self, **kwargs) -> TaskRunStatus:
         """
         Override do_run method to run the task and update status.
         """
         try:
-            if self.task_status:
-                self.task_status.running()  # Mark task as running
             self.execute_dataflow_task(**kwargs)  # Running Actual task workload
-            if self.task_status:
-                self.task_status.completed()  # Mark task as completed
-            self.on_success(**kwargs)
+            self.on_task_success(**kwargs)
             return TaskRunStatus.SUCCESS
         except Exception as e:
-            if self.task_status:
-                self.task_status.failed(exit_code=1, exit_message="Task failed", error_message=str(e))
-            self.on_failure(e, **kwargs)
-            return TaskRunStatus.ERROR
+            log.error(f"Exception occurred for task [ {self.task_id} ]: {e}")
+            raise
 
     @abstractmethod
     def execute_dataflow_task(self, **kwargs):
         """ Abstract method to be implemented by subclasses for executing the dataflow task. """
         pass
 
-    def on_success(self, **kwargs):
+    def on_task_success(self, **kwargs):
         pass
 
-    def on_failure(self, e: Exception, **kwargs):
+    def on_task_failure(self, e: Exception, **kwargs):
         pass
