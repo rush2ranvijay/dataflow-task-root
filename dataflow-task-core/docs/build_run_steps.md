@@ -7,7 +7,7 @@ dataflow:>app register --type task  --name python-simple-task --uri docker://rus
 dataflow:>task create --name python-simple-task --definition "python-simple-task"
 dataflow:>task launch --name python-simple-task
 
-############################################## Manual installation ############################################
+######### Manual installation ######################
 
 1. wget -O spring-cloud-dataflow-server-2.11.2.jar https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dataflow-server/2.11.2/spring-cloud-dataflow-server-2.11.2.jar
 
@@ -52,11 +52,11 @@ docker run --network bridge --rm -e deployerId=python-simple-task-b5d92403-4473-
 
 docker run --network bridge --rm -e deployerId=python-simple-task-b5d92403-4473-4b59-b924-e7b64bc48805 -e SPRING_APPLICATION_JSON='{\"endpoints.jmx.unique-names\":\"true\",\"endpoints.shutdown.enabled\":\"true\",\"spring.datasource.driverClassName\":\"org.postgresql.Driver\",\"management.metrics.tags.application\":\"${spring.cloud.task.name:unknown}-${spring.cloud.task.executionid:unknown}\",\"spring.cloud.task.name\":\"python-simple-task\",\"spring.datasource.password\":\"postgres\",\"spring.cloud.deployer.bootVersion\":\"2\",\"management.metrics.tags.service\":\"task-application\",\"spring.datasource.username\":\"postgres\",\"spring.datasource.url\":\"jdbc:postgresql://host.docker.internal:5432/dataflow\",\"spring.cloud.task.initialize-enabled\":\"false\",\"server.port\":\"32353\",\"spring.cloud.task.schemaTarget\":\"boot2\",\"spring.batch.jdbc.table-prefix\":\"BATCH_\",\"spring.cloud.task.tablePrefix\":\"TASK_\",\"spring.jmx.default-domain\":\"python-simple-task-b5d92403-4473-4b59-b924-e7b64bc48805\"}' -p 32353:32353 rush2ranvijay/python_simple_task:0.2 --app.python-simple-task.spring.cloud.task.initialize-enabled=false --app.python-simple-task.spring.batch.jdbc.table-prefix=BATCH_ --app.python-simple-task.spring.cloud.task.tablePrefix=TASK_ --app.python-simple-task.spring.cloud.task.schemaTarget=boot2 --app.python-simple-task.spring.cloud.deployer.bootVersion=2 --spring.cloud.task.executionid=1
 
-##########################################  TCP Connection issue for PostgresSQL  #############################################################
+##############  TCP Connection issue for PostgresSQL  ###################
 
 We might face TCP/IP connection issue while accessing the PostgresSQL or any other database from docker container 
 of our python app, then we have to add docker container's IP in the pg_hba.conf file to allow remote machine/host 
-connection to the database as below
+connection to the database as below. However, On local machine location of pg_hba.conf is `C:\Program Files\PostgreSQL\16\data`
 
 # IPv4 local connections:
 host    all             127.0.0.1/32            scram-sha-256
